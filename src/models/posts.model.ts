@@ -1,8 +1,9 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db';
+import Comment from './comment.model';
 
 const Post = sequelize.define('Post', {
-  id: {
+  postID: {
     type: DataTypes.INTEGER,
     primaryKey: true,
   },
@@ -12,7 +13,7 @@ const Post = sequelize.define('Post', {
   },
   body: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
   },
   attachment: {
     type: DataTypes.STRING,
