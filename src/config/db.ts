@@ -9,8 +9,7 @@ export const sequelize = new Sequelize(
     {
     host: 'localhost',
     dialect: 'postgres',
-    port: Number(process.env.PG_PORT), 
-    models: [Posts]
+    port: Number(process.env.PG_PORT)
 }); 
 
 

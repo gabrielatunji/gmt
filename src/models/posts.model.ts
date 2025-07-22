@@ -12,11 +12,7 @@ const Post = sequelize.define('Post', {
   },
   body: {
     type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-    validate: {
-      isEmail: true,
-    },
+    allowNull: false
   },
   attachment: {
     type: DataTypes.STRING,
