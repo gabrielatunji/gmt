@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Admin } from '../models/admin.model';
 import { hashPassword, confirmPassword } from '../utils/bcrypt';
-import  Post  from '../models/posts.model';
-import  Comment  from '../models/comment.model';
+import { Post } from '../models/posts.model';
+import { Comment } from '../models/comment.model';
 
 interface SignupRequestBody {
   email: string;
@@ -15,7 +15,7 @@ export const signupAdmin = async (req: Request<{}, {}, SignupRequestBody>, res: 
   const { email, password, firstName, lastName } = req.body;
     try {
         if (!firstName || !lastName || !email || !password) {
-            return res.status(400).json({message: "All fields are required"});
+            return res.status(400).json({ message: "All fields are required" });
         }
 
         const existingAdmin = await Admin.findOne({ where: { email } });
@@ -71,14 +71,14 @@ interface LoginRequestBody {
     }
 };
 
-export const adminDeletePost = async (req: Request, res: Response): Promise<Response> => {
+export const adminDeletePost = async (req: Request<{id:string}>, res: Response): Promise<Response> => {
     const { id } = req.params;
     try {
         if (!id) {
             return res.status(400).json({ message: "Post ID is required" });
         }
 
-        const deletedPost = await Post.destroy({ where: { id } });
+        const deletedPost = await Post.destroy({ where: { postID: id } });
 
         if (deletedPost === 0) {
             return res.status(404).json({ message: "Post not found" });
@@ -92,7 +92,7 @@ export const adminDeletePost = async (req: Request, res: Response): Promise<Resp
     }
 };
 
-export const adminDeleteComment = async (req: Request, res: Response): Promise<Response> => {
+export const adminDeleteComment = async (req: Request<{id:string}>, res: Response): Promise<Response> => {
     const { id } = req.params;
     try {
         if (!id) {
@@ -112,3 +112,4 @@ export const adminDeleteComment = async (req: Request, res: Response): Promise<R
         return res.status(500).json({ message: "Failed to delete comment", error: error.message });
     }
 };
+

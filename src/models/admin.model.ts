@@ -14,7 +14,6 @@ interface AdminAttributes {
 // Creation attributes interface
 interface AdminCreationAttributes extends Omit<AdminAttributes, 'id' | 'role'> {}
 
-
 // Extend the Model class
 class Admin extends Model<AdminAttributes, AdminCreationAttributes> implements AdminAttributes {
     public id!: number;
@@ -64,46 +63,3 @@ Admin.init({
 });
 
 export {Admin}
-
-
-// import { sequelize } from "../config/db";
-// import { DataTypes } from "sequelize";
-
-// const Admin = sequelize.define('Admin', {
-//     id: {
-//         type: DataTypes.INTEGER,
-//         primaryKey: true,
-//         autoIncrement: true
-//     }, 
-//     email: {
-//         type: DataTypes.STRING,
-//         allowNull: false
-//     },
-//     password: {
-//         type: DataTypes.STRING,
-//         allowNull:false
-//     }, 
-//     firstName: {
-//         type: DataTypes.STRING,
-//         allowNull: false
-//     },
-//     lastName: {
-//         type: DataTypes.STRING,
-//         allowNull: false
-//     },
-//     role: {
-//         type: DataTypes.STRING,
-//         allowNull: false,
-//         defaultValue: 'ADMIN'
-//     }
-// }, 
-// {
-//     tableName: 'admins',
-//     timestamps: true
-// }); 
-
-
-// export default Admin 
-
-
-
