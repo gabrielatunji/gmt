@@ -12,12 +12,10 @@ export const sequelize = new Sequelize(
     port: Number(process.env.PG_PORT)
 }); 
 
-
-
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Database connection has been established successfully.');
+    console.log('Connected to Database');
     await sequelize.sync({ alter: true });
     console.log('All models were synchronized successfully.');
   } catch (error) {
@@ -25,6 +23,5 @@ const connectDB = async () => {
     process.exit(1);
   }
 };
-
 
 export default connectDB

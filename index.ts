@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv'; 
 import connectDB from './src/config/db'; 
-import { sequelize } from './src/config/db';
+import { sequelize } from './src/config/db'
 
 
 dotenv.config(); 
@@ -16,17 +16,8 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to GMT API!');
 }); 
 
-const startServer = async () => {
-    try {
-        await connectDB(); 
-        await sequelize.sync({ alter: true }); 
 
-    app.listen(PORT, () => {
+app.listen(PORT, () => {
+    connectDB(); 
     console.log(`Server is running on port ${PORT}`);
 });
-    } catch (error) {
-        console.error('Server failed to start:', error);
-    }
-};
-
-startServer();
