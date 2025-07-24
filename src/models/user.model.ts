@@ -11,6 +11,9 @@ interface UserAttributes {
     password: string;
     firstName: string;
     lastName: string;
+    paymentStatus: string | null; 
+    paymentDate: Date | null; 
+    isSubscribed: boolean | null
 }
 
 // Creation attributes interface
@@ -23,6 +26,9 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     public password!: string;
     public firstName!: string;
     public lastName!: string;
+    public paymentStatus!: string | null;
+    public isSubscribed!: boolean | null;
+    public paymentDate!: Date | null;
 
     // timestamps!
     public readonly createdAt!: Date;
@@ -72,6 +78,20 @@ User.init({
         type: DataTypes.STRING,
         allowNull: false
     },
+    paymentStatus: {
+        type: DataTypes.ENUM,
+        allowNull: true,
+        defaultValue: 'Not Paid',
+        values: ['Not Paid', 'Paid']
+    },
+    isSubscribed: {
+        type: DataTypes.BOOLEAN, 
+        defaultValue: 'false',
+    },
+    paymentDate: {
+        type: DataTypes.DATE,
+        allowNull: true
+    }
     
 },
 {

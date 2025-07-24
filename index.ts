@@ -1,7 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv'; 
 import connectDB from './src/config/db'; 
-import { sequelize } from './src/config/db'
 
 
 dotenv.config(); 
