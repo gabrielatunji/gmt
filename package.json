@@ -19,6 +19,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@types/axios": "^0.9.36",
     "@types/bcrypt": "^6.0.0",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.3",
@@ -27,6 +28,7 @@
     "@types/node": "^24.0.13",
     "@types/pg": "^8.15.4",
     "@types/sequelize": "^4.28.20",
+    "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "concurrently": "^9.2.0",
     "dotenv": "^17.2.0",
@@ -37,6 +39,7 @@
     "nodemon": "^3.1.10",
     "pg": "^8.16.3",
     "rimraf": "^6.0.1",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "uuid": "^11.1.0"
   }
 }

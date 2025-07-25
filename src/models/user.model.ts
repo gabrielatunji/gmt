@@ -13,7 +13,8 @@ interface UserAttributes {
     lastName: string;
     paymentStatus: string | null; 
     paymentDate: Date | null; 
-    isSubscribed: boolean | null
+    isSubscribed: boolean | null; 
+    tx_Ref: string | null; 
 }
 
 // Creation attributes interface
@@ -29,6 +30,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     public paymentStatus!: string | null;
     public isSubscribed!: boolean | null;
     public paymentDate!: Date | null;
+    public tx_Ref!: string| null; 
 
     // timestamps!
     public readonly createdAt!: Date;
@@ -90,6 +92,10 @@ User.init({
     },
     paymentDate: {
         type: DataTypes.DATE,
+        allowNull: true
+    }, 
+    tx_Ref: {
+        type: DataTypes.STRING,
         allowNull: true
     }
     

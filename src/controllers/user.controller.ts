@@ -10,10 +10,11 @@ interface SignupRequestBody {
     paymentStatus?: string;
     paymentDate?: Date;
     isSubscribed?: boolean;
+    tx_Ref?: string; 
 }
 
 export const userSignup = async (req: Request<{}, {}, SignupRequestBody>, res: Response): Promise<Response> => {
-    const { email, password, firstName, lastName, paymentStatus, paymentDate, isSubscribed } = req.body;
+    const { email, password, firstName, lastName, paymentStatus, paymentDate, isSubscribed, tx_Ref } = req.body;
     try {
         if (!firstName || !lastName || !email || !password) {
             return res.status(400).json({message: "All fields are required"});
@@ -33,7 +34,8 @@ export const userSignup = async (req: Request<{}, {}, SignupRequestBody>, res: R
             password: hashedPassword,
             paymentStatus,
             paymentDate,
-            isSubscribed
+            isSubscribed,
+            tx_Ref
         });
 
         return res.status(201).json({ message: "User created successfully", user: newUser });

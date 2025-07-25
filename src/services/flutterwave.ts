@@ -1,31 +1,39 @@
-require('dotenv').config();
-const axios = require('axios');
-const User = require('../models/user.model');
-const SolarPackage = require('../models/solarpackages.model');
+import dotenv from 'dotenv';
+import axios from 'axios';
+import { User } from '../models/user.model';
+import { v4 as uuidv4 } from 'uuid';
 
-const generatePaymentLink = async (email, packageName, amount, txRef) => {
-    try {
-        const user = await User.findOne({ email });
+dotenv.config(); 
+
+interface GeneratePaymentLinkPayload {
+  email: string;
+  amount: number;
+}
+const generatePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise<string> => {
+  try {
+    const user = await User.findOne({ where: { email: payload.email } });
         if (!user) {
             throw new Error("User not found");
         }
 
+    const tx_ref = uuidv4();
+    const amount = payload.amount;
+
         const response = await axios.post(
             'https://api.flutterwave.com/v3/payments',
             {
-                tx_ref: txRef,
-                amount: amount,
+                tx_ref,
+                amount,
                 currency: 'NGN',
-                redirect_url: 'https://lumobackend.onrender.com', //frontend confirmation url
+                redirect_url: 'https://gmt.onrender.com', // frontend confirmation url
                 customer: {
                     email: user.email,
-                    name: user.name,
-                    phonenumber: user.phone
+                    name: user.firstName
                 },
                 customizations: {
-                    title: 'LumoGrid Payment',
-                    description: `Payment for ${packageName} || Solar Package`,
-                    //logo: 'https://res.cloudinary.com/dwx1tdonc/image/upload/v1745532815/ChatGPT_Image_Apr_24_2025_11_10_53_PM_ktlsmn.png',
+                    title: 'GMT Payment',
+                    description: `Payment for ${user.firstName} Monthly Subscription` || 'GMT Subscription',
+                    logo: 'https://res.cloudinary.com/dwx1tdonc/image/upload/v1753439314/GMT_pd1yxo.png',
                 },
             },
             {
@@ -36,12 +44,12 @@ const generatePaymentLink = async (email, packageName, amount, txRef) => {
             }
         );
 
-        console.log('Payment link generated:', response.data.data.link);
-        return response.data.data.link;
-    } catch (err) {
+        console.log('Payment link generated:', (response.data as any).data.link);
+        return (response.data as any).data.link;
+  } catch (err: any) {
         console.error('Error generating payment link:', err.response?.data || err.message);
         throw err;
     }
 };
 
-module.exports = { generatePaymentLink };
+export { generatePaymentLink };
