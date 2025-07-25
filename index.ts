@@ -1,6 +1,8 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv'; 
 import connectDB from './src/config/db'; 
+import userRouter from './src/routers/user.route';
+import postRouter from './src/routers/post.route';
 
 
 dotenv.config(); 
@@ -15,6 +17,9 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to GMT API!');
 }); 
 
+
+app.use('/api/v1/user', userRouter); 
+app.use('/api/v1/post', postRouter); 
 
 app.listen(PORT, () => {
     connectDB(); 

@@ -55,7 +55,7 @@ export const deletePost = async (req: Request<{id:string}, {}, {}>, res: Respons
 
 
 
-exports.getAllPosts = async (req: Request, res: Response) => {
+export const getAllPosts = async (req: Request, res: Response) => {
     const currentPage = parseInt(req.query.page as string, 10) || 1; //default is 1
     const postPerPage = 10;
     const offset = (currentPage - 1) * postPerPage;
@@ -79,7 +79,7 @@ exports.getAllPosts = async (req: Request, res: Response) => {
     }
 };
 
-exports.getSinglePostByID = async (req: Request<{id:string}>, res: Response) => {
+export const getSinglePostByID = async (req: Request<{id:string}>, res: Response) => {
     const { id } = req.params;
     try{
         if (!id) {
