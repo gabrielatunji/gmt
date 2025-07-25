@@ -1,10 +1,6 @@
 import multer from 'multer';
 import path from 'path';
 
-// allowed file types
-const allowedFileTypes = ['.pdf', '.docx', '.jpg', '.jpeg', '.png', '.gif'];
-
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -16,8 +12,10 @@ const storage = multer.diskStorage({
   }
 });
 
+
 // File filter to only allow certain file types
 const fileFilter = (req: any, file: any, cb: any) => {
+  const allowedFileTypes = ['.pdf', '.docx', '.jpg', '.jpeg', '.png', '.gif'];
   const ext = path.extname(file.originalname).toLowerCase();
   if (allowedFileTypes.includes(ext)) {
     cb(null, true);
