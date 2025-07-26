@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 dotenv.config(); 
 
 interface GeneratePaymentLinkPayload {
-  email: string;
+  email: string | null;
   amount: number;
 }
 const generatePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise<string> => {

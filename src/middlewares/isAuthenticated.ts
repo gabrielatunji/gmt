@@ -5,12 +5,12 @@ import { User } from '../models/user.model';
 
 dotenv.config();
 
-//declare and export the AuthenticatedRequest interface for use in user controller 
+//Declare and export the AuthenticatedRequest interface for use in user controller 
 export interface AuthenticatedRequest extends Request {
     user?: {
-        id: string;
-        email: string;
-        firstName: string;
+        id: string,
+        email: string | null 
+        firstName: string | null
     };
 }
 

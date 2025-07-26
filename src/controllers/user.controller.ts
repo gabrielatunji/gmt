@@ -4,7 +4,7 @@ import { hashPassword, confirmPassword } from '../utils/bcrypt';
 import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { generatePaymentLink } from '../services/flutterwave';
-import isAuthenticated, { AuthenticatedRequest } from '../middlewares/isAuthenticated';
+import { AuthenticatedRequest } from '../middlewares/isAuthenticated';
 
 dotenv.config();
 
@@ -98,16 +98,14 @@ export const userLogin = async (req: Request<{}, {}, LoginRequestBody>, res: Res
     }
 };
 
-//  Email and id derived from the authenticated user.
+// Define the PaymentRequestBody interface for the request body
 interface PaymentRequestBody {
     amount: number;
 }
 
-                                        //Pass both PaymentRequestBody and AuthenticatedRequest in the Request.Body
-export const userSubscriptions = async (req: Request<{}, {}, PaymentRequestBody> & AuthenticatedRequest, res: Response): Promise<Response> => {
-    const { amount } = req.body;
+// Use the AuthenticatedRequest interface for the Request object itself
+export const userSubscriptions = async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
 
-   
     if (!req.user) {
         return res.status(401).json({ message: 'Authentication failed: User information not found in request.' });
     }
@@ -121,13 +119,14 @@ export const userSubscriptions = async (req: Request<{}, {}, PaymentRequestBody>
             return res.status(404).json({ message: 'User associated with this token no longer exists.' });
         }
 
+        // Access the subscription amount from the request body
+        const { amount } = req.body as PaymentRequestBody;
         
         const paymentLink = await generatePaymentLink({
             email: userEmail,
-            amount: amount,
+            amount: amount, // Use the amount from the request body
         });
 
-        
         payingUser.paymentStatus = 'Initiated';
         await payingUser.save();
 
@@ -138,3 +137,4 @@ export const userSubscriptions = async (req: Request<{}, {}, PaymentRequestBody>
         return res.status(500).json({ message: "Failed to initiate payment", error: error.message });
     }
 };
+
