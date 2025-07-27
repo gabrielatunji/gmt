@@ -17,11 +17,10 @@ interface UserAttributes {
     paymentDate: Date | null;
     isSubscribed: boolean | null;
     tx_Ref: string | null;
-    subscriptionAmount: number; 
 }
 
 // Creation attributes interface
-interface UserCreationAttributes extends Omit<UserAttributes, 'id' | 'subscriptionAmount'> {}
+interface UserCreationAttributes extends Omit<UserAttributes, 'id'> {}
 
 // Extend the Model class
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
@@ -111,11 +110,6 @@ User.init({
     tx_Ref: {
         type: DataTypes.STRING,
         allowNull: true
-    }, 
-    subscriptionAmount: {
-        type: DataTypes.NUMBER,
-        allowNull: false,
-        defaultValue: 10000
     }
 
 

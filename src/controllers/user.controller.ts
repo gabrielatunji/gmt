@@ -104,17 +104,14 @@ interface PaymentRequestBody {
 }
 
 // Use the AuthenticatedRequest interface for the Request object itself
-export const userSubscriptions = async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
-
-    if (!req.user) {
-        return res.status(401).json({ message: 'Authentication failed: User information not found in request.' });
-    }
-
-    // Use the authenticated user's details from the token
-    const { id: userID, email: userEmail } = req.user;
+export const userSubscriptions = async (req: Request, res: Response): Promise<Response> => {
+    const { user } = req as AuthenticatedRequest; 
 
     try {
-        const payingUser = await User.findByPk(userID);
+        if(!user){
+            return res.status(404).json({message: 'Unauthorized'})
+        }
+        const payingUser = await User.findByPk(user.id);
         if (!payingUser) {
             return res.status(404).json({ message: 'User associated with this token no longer exists.' });
         }
@@ -123,7 +120,7 @@ export const userSubscriptions = async (req: AuthenticatedRequest, res: Response
         const { amount } = req.body as PaymentRequestBody;
         
         const paymentLink = await generatePaymentLink({
-            email: userEmail,
+            email: user.email,
             amount: amount, // Use the amount from the request body
         });
 
