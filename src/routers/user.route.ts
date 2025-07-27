@@ -1,40 +1,13 @@
-'use strict';
+import { Router, RequestHandler } from "express";
+import { userLogin, userSignup, userSubscriptions } from "../controllers/user.controller";
+import isAuthenticated  from '../middlewares/isAuthenticated'; 
 
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.changeColumn('users', 'paymentStatus', {
-      type: Sequelize.ENUM,
-      allowNull: true, // Changed to true to match the model
-      values: ['Not Paid', 'Initiated', 'Subscribed'],
-      defaultValue: 'Not Paid'
-    });
-    await queryInterface.addColumn('users', 'googleID', {
-      type: Sequelize.STRING,
-      allowNull: true
-    });
-    await queryInterface.addColumn('users', 'githubID', {
-      type: Sequelize.STRING,
-      allowNull: true
-    });
-    await queryInterface.changeColumn('users', 'email', {
-      type: Sequelize.STRING,
-      allowNull: true
-    });
-  },
+const userRouter = Router();
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.changeColumn('users', 'paymentStatus', {
-      type: Sequelize.ENUM,
-      allowNull: false,
-      values: ['Not Paid', 'Initiated', 'Paid'], // Reverting to original values
-      defaultValue: 'Not Paid'
-    });
-    await queryInterface.removeColumn('users', 'googleID');
-    await queryInterface.removeColumn('users', 'githubID');
-    await queryInterface.changeColumn('users', 'email', {
-      type: Sequelize.STRING,
-      allowNull: false // Reverting to original value
-    });
-  }
-};
+userRouter.post('/signup', userSignup);
+userRouter.post('/login', userLogin);
+userRouter.post('/subscribe', isAuthenticated as RequestHandler, userSubscriptions);
+
+
+export default userRouter;
+
