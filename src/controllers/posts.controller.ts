@@ -3,6 +3,7 @@ import { Post } from '../models/posts.model';
 import { User } from '../models/user.model';
 import generatePostID from '../utils/nanoid'; 
 import { AuthenticatedRequest } from '../middlewares/isAuthenticated';
+import { Admin } from '../models/admin.model';
 
 interface NewPost {
     title: string;
@@ -43,9 +44,16 @@ export const createPost = async (req: Request<{}, {}, NewPost>, res: Response): 
 
 export const deletePost = async (req: Request<{id:string}, {}, {}>, res: Response): Promise<Response> => {
     const { id } = req.params;
+    const { user } = req as unknown as AuthenticatedRequest
     try {
+
+        const deletingUser = await Admin.findByPk(user.id)
+
+        if(!deletingUser){
+            return res.status(401).json({message: "Unauthorized"}); 
+        }
         if (!id) {
-            return res.status(400).json({ message: "Post ID is required" });
+            return res.status(400).json({ message: "Unable to fetch post" });
         }
 
         const deletedPost = await Post.destroy({ where: { postID: id } });

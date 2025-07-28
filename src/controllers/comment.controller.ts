@@ -1,8 +1,9 @@
 
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import { Comment } from "../models/comment.model";
 import { AuthenticatedRequest } from "../middlewares/isAuthenticated";
 import { User } from "../models/user.model"; 
+import { Admin } from "../models/admin.model";
 
 
 interface MakeCommentBody {
@@ -18,6 +19,7 @@ export const makeComment = async (req: Request<{ id: string }, {}, MakeCommentBo
          if (!commentingUser) {
             return res.status(400).json({ message: "Login to add a comment" });
         }
+        
          if (!postID) {
             return res.status(400).json({ message: "Post not found" });
         }
@@ -26,7 +28,7 @@ export const makeComment = async (req: Request<{ id: string }, {}, MakeCommentBo
            return res.status(400).json({ message: "Comment body is required" });
         }
 
-        // Create a comment associated with a post
+        
         const comment = await Comment.create({
             postID: postID,
             userID: commentingUser.id,
@@ -42,7 +44,14 @@ export const makeComment = async (req: Request<{ id: string }, {}, MakeCommentBo
 
 export const deleteComment = async (req: Request<{id:string}, {}, {}>, res: Response): Promise<Response> => {
     const { id } = req.params;
+    const { user } = req as unknown as AuthenticatedRequest; 
     try {
+
+        const deletingComment = await Admin.findByPk(user.id)
+        if (!deletingComment){
+            return res.status(401).json({message: "Unauthorized"})
+        }
+
         if (!id) {
             return res.status(400).json({ message: "Comment ID is required" });
         }
