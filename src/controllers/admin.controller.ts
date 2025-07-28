@@ -3,6 +3,7 @@ import { Admin } from '../models/admin.model';
 import { hashPassword, confirmPassword } from '../utils/bcrypt';
 import { Post } from '../models/posts.model';
 import { Comment } from '../models/comment.model';
+import jwt, { Secret, JwtPayload } from 'jsonwebtoken'
 
 interface SignupRequestBody {
   email: string;
@@ -63,7 +64,25 @@ interface LoginRequestBody {
         if (!passwordMatch) {
             return res.status(401).json({ message: "Invalid credentials" });
         }
-        return res.status(200).json({ message: "Login successful", admin });
+        
+        const payload: JwtPayload = {
+                    id: admin.id,
+                    email: admin.email,
+                    firstName: admin.firstName,
+        };
+        
+        const options: jwt.SignOptions = {
+                expiresIn: '1h',
+        };
+        
+        const jwtSecret = process.env.JWT_SECRET;
+            if (!jwtSecret) {
+                console.error("Login error: JWT_SECRET is not set.");
+                return res.status(500).json({ message: "Server configuration error." });
+            }
+        
+        const token = jwt.sign(payload, jwtSecret as Secret, options);
+        return res.status(200).json({ message: "Login successful", admin , token});
 
     } catch (error: any) {
         console.error("Error logging in admin:", error);

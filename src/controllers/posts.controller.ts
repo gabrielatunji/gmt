@@ -3,35 +3,63 @@ import { Post } from '../models/posts.model';
 import { User } from '../models/user.model';
 import generatePostID from '../utils/nanoid'; 
 import { AuthenticatedRequest } from '../middlewares/isAuthenticated';
+import { uploadFile } from '../services/backblaze';
 import { Admin } from '../models/admin.model';
+import fs from 'fs';
 
 interface NewPost {
     title: string;
     body: string;
-    attachment?: string;
 }
 
+
 export const createPost = async (req: Request<{}, {}, NewPost>, res: Response): Promise<Response> => {
-    const { title, body, attachment } = req.body;
+    const { title, body } = req.body;
     const { user } = req as AuthenticatedRequest; 
+
     try {
         if (!title || !body) {
             return res.status(400).json({ message: 'Title and body are required' });
         }
 
-        const postingUser = await User.findByPk(user.id) 
+        const postingUser = await User.findByPk(user.id);
 
-        if(!postingUser){
-            return res.status(404).json({message: 'Login to make a post'})
+        if (!postingUser) {
+            return res.status(404).json({ message: 'Login to make a post' });
         }
+        let attachmentURL = null;
+        if (req.file) {
+            const bucketId = process.env.BACKBLAZE_BUCKET_ID!;
+            const fileName = `${generatePostID()}-${req.file.originalname}`;
+            const filePath = req.file.path;
 
+            try {
+                // Read the file from disk into a Buffer
+                const fileData = fs.readFileSync(filePath);
+                attachmentURL = await uploadFile({
+                    bucketId: bucketId,
+                    fileName: fileName,
+                    fileData: fileData,
+                    contentType: req.file.mimetype,
+                });
+                 // Delete the file from the local filesystem AFTER uploading to Backblaze
+                 fs.unlinkSync(filePath);
+            } catch (uploadError: any) {
+                console.error("Error uploading to Backblaze:", uploadError);
+                 // Clean up the file on error
+                 if (fs.existsSync(filePath)) {
+                     fs.unlinkSync(filePath);
+            }
+                return res.status(500).json({ message: 'Failed to upload attachment', error: uploadError.message });
+        }
+        }
         const postID = generatePostID();
         const newPost = await Post.create({
             postID: postID,
             userID: postingUser.id,
             title,
             body,
-            attachment
+            attachment: attachmentURL,
         });
 
         return res.status(201).json({ message: 'Post created successfully', post: newPost }); 
@@ -41,16 +69,14 @@ export const createPost = async (req: Request<{}, {}, NewPost>, res: Response): 
     }
 };
 
-
-export const deletePost = async (req: Request<{id:string}, {}, {}>, res: Response): Promise<Response> => {
+export const deletePost = async (req: Request<{ id: string }, {}, {}>, res: Response): Promise<Response> => {
     const { id } = req.params;
-    const { user } = req as unknown as AuthenticatedRequest
+    const { user } = req as unknown as AuthenticatedRequest;
     try {
 
         const deletingUser = await Admin.findByPk(user.id)
-
-        if(!deletingUser){
-            return res.status(401).json({message: "Unauthorized"}); 
+        if (!deletingUser) {
+            return res.status(401).json({ message: "Unauthorized" });
         }
         if (!id) {
             return res.status(400).json({ message: "Unable to fetch post" });
@@ -73,18 +99,18 @@ export const deletePost = async (req: Request<{id:string}, {}, {}>, res: Respons
 
 
 export const getAllPosts = async (req: Request, res: Response) => {
-    const currentPage = parseInt(req.query.page as string, 10) || 1; //default is 1
+    const currentPage = parseInt(req.query.page as string, 10) || 1;
     const postPerPage = 10;
     const offset = (currentPage - 1) * postPerPage;
     try {
         const { count, rows: posts } = await Post.findAndCountAll({
             limit: postPerPage,
             offset: offset,
-            order: [['createdAt', 'DESC']] // Sort by createdAt, latest first 
+            order: [['createdAt', 'DESC']]
         });
 
         const totalPages = Math.ceil(count / postPerPage);
-        return res.status(200).json({ 
+        return res.status(200).json({
             posts,
             currentPage,
             totalPages,
@@ -96,11 +122,11 @@ export const getAllPosts = async (req: Request, res: Response) => {
     }
 };
 
-export const getSinglePostByID = async (req: Request<{id:string}>, res: Response) => {
+export const getSinglePostByID = async (req: Request<{ id: string }>, res: Response) => {
     const { id } = req.params;
-    try{
+    try {
         if (!id) {
-        return res.status(400).json({ message: 'Post ID is required' });
+            return res.status(400).json({ message: 'Post ID is required' });
         }
 
         const post = await Post.findByPk(id);
@@ -115,4 +141,3 @@ export const getSinglePostByID = async (req: Request<{id:string}>, res: Response
         return res.status(500).json({ message: 'Failed to fetch post', error: error.message });
     }
 };
-

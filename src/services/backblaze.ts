@@ -1,4 +1,7 @@
 import B2 from 'backblaze-b2';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Initialize B2 with your account ID and application key
 const b2 = new B2({
@@ -54,9 +57,8 @@ export const uploadFile = async (payload: UploadFilePayload) => {
       mime: contentType,
       data: fileData, // Pass the file data (Buffer or Stream)
     });
-
     console.log(`File "${fileName}" uploaded successfully to bucket "${bucketId}"`);
-
+        return `https://s3.eu-central-003.backblazeb2.com/GMT/${fileName}` // Construct the URL
   } catch (error) {
     console.error("Error uploading file:", error);
     throw new Error("Failed to upload file");
