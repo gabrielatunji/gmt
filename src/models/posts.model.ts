@@ -7,7 +7,7 @@ import Sequelize from 'sequelize';
 // Define the attributes interface
 interface PostAttributes {
     postID: string; 
-    userID: string; 
+    userID: number; 
     title: string;
     body: string;
     attachment: string | null;
@@ -19,7 +19,7 @@ interface PostCreationAttributes extends PostAttributes {}
 // Extend the Model class
 class Post extends Model<PostAttributes, PostCreationAttributes> implements PostAttributes {
     public postID!: string; 
-    public userID!: string; 
+    public userID!: number; 
     public title!: string;
     public body!: string;
     public attachment!: string | null;
@@ -48,7 +48,7 @@ Post.init({
         primaryKey: true,
     },
     userID: { 
-        type: DataTypes.STRING, 
+        type: DataTypes.INTEGER, 
         allowNull: false,
         references: {
             model: User, // Reference the User model

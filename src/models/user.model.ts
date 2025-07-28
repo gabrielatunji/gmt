@@ -6,12 +6,12 @@ import Sequelize from 'sequelize';
 
 // Define the attributes interface
 interface UserAttributes {
-    id: string;
+    id: number;
     googleID: string | null;
     githubID: string | null;
-    email: string | null;
+    email: string;
     password: string;
-    firstName: string | null;
+    firstName: string;
     lastName: string | null;
     paymentStatus: string | null;
     paymentDate: Date | null;
@@ -24,12 +24,12 @@ interface UserCreationAttributes extends Omit<UserAttributes, 'id'> {}
 
 // Extend the Model class
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-    public id!: string;
+    public id!: number;
     public googleID!: string | null;
     public githubID!: string | null;
-    public email!: string | null;
+    public email!: string;
     public password!: string;
-    public firstName!: string | null;
+    public firstName!: string;
     public lastName!: string | null;
     public paymentStatus!: string | null;
     public isSubscribed!: boolean | null;
@@ -66,8 +66,10 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
 User.init({
     id: {
-        type: DataTypes.STRING,
-        primaryKey: true
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
     },
     googleID: {
         type: DataTypes.STRING,

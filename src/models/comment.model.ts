@@ -7,7 +7,7 @@ import Sequelize from 'sequelize';
 interface CommentAttributes {
     id: number;
     postID: string;
-    userID: string;
+    userID: number;
     body: string;
 }
 
@@ -16,7 +16,7 @@ interface CommentCreationAttributes extends Omit<CommentAttributes, 'id'> {}
 class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
     public id!: number;
     public postID!: string;
-    public userID!: string;
+    public userID!: number;
     public body!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -39,7 +39,7 @@ Comment.init({
         onDelete: 'CASCADE' // Cascade delete if post is deleted
   },
     userID: { // Foreign key for User
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false,
         references: {
             model: User, // Reference the User model

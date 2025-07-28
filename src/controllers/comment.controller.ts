@@ -1,22 +1,25 @@
 
 import { Request, Response } from "express";
 import { Comment } from "../models/comment.model";
+import { AuthenticatedRequest } from "../middlewares/isAuthenticated";
+import { User } from "../models/user.model"; 
 
 
 interface MakeCommentBody {
-    userID: string;
     body: string;
 }
 
 export const makeComment = async (req: Request<{ id: string }, {}, MakeCommentBody>, res: Response): Promise<Response> => {
     const { id: postID } = req.params;
-    const { userID, body } = req.body;
+    const { body } = req.body;
+    const { user } = req as AuthenticatedRequest; 
     try {
-        if (!postID) {
-            return res.status(400).json({ message: "Post ID is required" });
+        const commentingUser = await User.findByPk(user.id)
+         if (!commentingUser) {
+            return res.status(400).json({ message: "Login to add a comment" });
         }
-         if (!userID) {
-            return res.status(400).json({ message: "User ID is required" });
+         if (!postID) {
+            return res.status(400).json({ message: "Post not found" });
         }
 
         if (!body) {
@@ -26,7 +29,7 @@ export const makeComment = async (req: Request<{ id: string }, {}, MakeCommentBo
         // Create a comment associated with a post
         const comment = await Comment.create({
             postID: postID,
-            userID: userID,
+            userID: commentingUser.id,
             body: body
         });
 

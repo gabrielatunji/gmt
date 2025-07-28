@@ -7,14 +7,14 @@ dotenv.config();
 
 // Custom type for authenticated user data
 export interface AuthenticatedUser {
-  id: string;
-  email: string | null;
-  firstName: string | null;
+  id: number;
+  email: string;
+  firstName: string;
 }
 
 // Extend Express Request type with `user`
 export interface AuthenticatedRequest extends Request {
-  user?: AuthenticatedUser;
+  user: AuthenticatedUser;
 }
 
 const isAuthenticated = async (req: AuthenticatedRequest, res: Response, next:NextFunction): Promise<void> => {

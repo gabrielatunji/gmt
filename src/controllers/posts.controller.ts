@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { Post } from '../models/posts.model';
+import { User } from '../models/user.model';
 import generatePostID from '../utils/nanoid'; 
+import { AuthenticatedRequest } from '../middlewares/isAuthenticated';
 
 interface NewPost {
     title: string;
@@ -10,15 +12,22 @@ interface NewPost {
 
 export const createPost = async (req: Request<{}, {}, NewPost>, res: Response): Promise<Response> => {
     const { title, body, attachment } = req.body;
+    const { user } = req as AuthenticatedRequest; 
     try {
         if (!title || !body) {
             return res.status(400).json({ message: 'Title and body are required' });
         }
 
+        const postingUser = await User.findByPk(user.id) 
+
+        if(!postingUser){
+            return res.status(404).json({message: 'Login to make a post'})
+        }
+
         const postID = generatePostID();
         const newPost = await Post.create({
             postID: postID,
-            userID: "temp", // requires userID
+            userID: postingUser.id,
             title,
             body,
             attachment
