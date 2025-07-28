@@ -58,7 +58,7 @@ export const uploadFile = async (payload: UploadFilePayload) => {
       data: fileData, // Pass the file data (Buffer or Stream)
     });
     console.log(`File "${fileName}" uploaded successfully to bucket "${bucketId}"`);
-        return `https://s3.eu-central-003.backblazeb2.com/GMT/${fileName}` // Construct the URL
+        return `https://f003.backblazeb2.com/file/gmtbucket/${fileName}` // Construct the URL
   } catch (error) {
     console.error("Error uploading file:", error);
     throw new Error("Failed to upload file");
@@ -76,14 +76,14 @@ export const downloadFile = async (payload: DownloadFilePayload): Promise<Buffer
         await b2.authorize();
 
         // Get the file info
-        const fileInfoResponse = await b2.getFileInfo({
-            fileId: payload.fileName,
-        });
+        // const fileInfoResponse = await b2.getFileInfo({
+        //     fileId: payload.fileName,
+        // });
 
         const response = await b2.downloadFileByName({
             bucketName: payload.bucketName,
             fileName: payload.fileName,
-            responseType: 'json'
+            responseType: 'arraybuffer'
         });
         if (response.status !== 200) {
             throw new Error(`Failed to download file: ${response.status} ${response.statusText}`);

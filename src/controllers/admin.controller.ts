@@ -82,7 +82,7 @@ interface LoginRequestBody {
             }
         
         const token = jwt.sign(payload, jwtSecret as Secret, options);
-        return res.status(200).json({ message: "Login successful", admin , token});
+        return res.status(200).json({ message: "Login successful", admin: admin.firstName , token});
 
     } catch (error: any) {
         console.error("Error logging in admin:", error);
