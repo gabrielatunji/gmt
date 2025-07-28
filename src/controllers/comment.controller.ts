@@ -12,7 +12,7 @@ interface MakeCommentBody {
 export const makeComment = async (req: Request<{ id: string }, {}, MakeCommentBody>, res: Response): Promise<Response> => {
     const { id: postID } = req.params;
     const { body } = req.body;
-    const { user } = req as AuthenticatedRequest; 
+    const { user } = req as unknown as AuthenticatedRequest; 
     try {
         const commentingUser = await User.findByPk(user.id)
          if (!commentingUser) {
