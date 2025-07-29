@@ -62,4 +62,4 @@ Admin.init({
     timestamps: true
 });
 
-export {Admin}
+export { Admin }

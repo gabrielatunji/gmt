@@ -69,8 +69,8 @@ export const createPost = async (req: Request<{}, {}, NewPost>, res: Response): 
     }
 };
 
-export const deletePost = async (req: Request<{ id: string }, {}, {}>, res: Response): Promise<Response> => {
-    const { id } = req.params;
+export const userDeletePost = async (req: Request<{ postID: string }, {}, {}>, res: Response): Promise<Response> => {
+    const { postID } = req.params;
     const { user } = req as unknown as AuthenticatedRequest;
     try {
 
@@ -78,11 +78,11 @@ export const deletePost = async (req: Request<{ id: string }, {}, {}>, res: Resp
         if (!deletingUser) {
             return res.status(401).json({ message: "Unauthorized" });
         }
-        if (!id) {
+        if (!postID) {
             return res.status(400).json({ message: "Unable to fetch post" });
         }
 
-        const deletedPost = await Post.destroy({ where: { postID: id } });
+        const deletedPost = await Post.destroy({ where: { postID: postID } });
 
         if (deletedPost === 0) {
             return res.status(404).json({ message: "Post not found" });
@@ -122,14 +122,14 @@ export const getAllPosts = async (req: Request, res: Response) => {
     }
 };
 
-export const getSinglePostByID = async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params;
+export const getSinglePostByID = async (req: Request<{ postID: string }>, res: Response) => {
+    const { postID } = req.params;
     try {
-        if (!id) {
+        if (!postID) {
             return res.status(400).json({ message: 'Post ID is required' });
         }
 
-        const post = await Post.findByPk(id);
+        const post = await Post.findByPk(postID);
 
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
