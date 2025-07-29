@@ -1,16 +1,16 @@
 import { Router, RequestHandler } from "express";
-import { createPost, getAllPosts, getSinglePostByID, userDeletePost } from "../controllers/posts.controller";
+import { createPost, getAllPosts, getSinglePostByID, deletePost } from "../controllers/posts.controller";
 import isAuthenticated from "../middlewares/isAuthenticated";
 import upload from "../middlewares/multer";
-import { adminDeleteComment, adminDeletePost } from "../controllers/admin.controller";
+import { makeComment } from "../controllers/comment.controller";
 
 const postRouter = Router();
 
 postRouter.post('/create', isAuthenticated as RequestHandler, upload.single('attachment'), createPost);
-postRouter.delete('/:postID/delete', isAuthenticated as RequestHandler, adminDeletePost);
-postRouter.delete('/:postID/delete', isAuthenticated as RequestHandler, userDeletePost); 
 postRouter.get('/allposts', getAllPosts);
 postRouter.get('/:postID', getSinglePostByID); 
+postRouter.delete('/:postID/delete', isAuthenticated as RequestHandler, deletePost);
+postRouter.post('/:postID/comment', isAuthenticated as RequestHandler ,makeComment); 
 
 
 export default postRouter;

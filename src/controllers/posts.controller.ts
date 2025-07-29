@@ -69,20 +69,27 @@ export const createPost = async (req: Request<{}, {}, NewPost>, res: Response): 
     }
 };
 
-export const userDeletePost = async (req: Request<{ postID: string }, {}, {}>, res: Response): Promise<Response> => {
+export const deletePost = async (req: Request<{ postID: string }, {}, {}>, res: Response): Promise<Response> => {
     const { postID } = req.params;
     const { user } = req as unknown as AuthenticatedRequest;
     try {
-
-        const deletingUser = await Admin.findByPk(user.id)
-        if (!deletingUser) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-        if (!postID) {
-            return res.status(400).json({ message: "Unable to fetch post" });
+        if(!postID){
+            return res.status(401).json({message: 'PostID is required'})
         }
 
-        const deletedPost = await Post.destroy({ where: { postID: postID } });
+        const postToDelete = await Post.findByPk(postID)
+
+        if(!postToDelete){
+            return res.status(404).json({message: 'Post not found'})
+        }
+
+        const isAdmin = await Admin.findByPk(user.id)
+
+        if (!isAdmin && postToDelete.userID !== user.id) {
+            return res.status(403).json({ message: "Forbidden: You're not authorized to delete this post" });
+        }
+
+        const deletedPost = await Post.destroy({ where: { postID } });
 
         if (deletedPost === 0) {
             return res.status(404).json({ message: "Post not found" });

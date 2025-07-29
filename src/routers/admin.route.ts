@@ -1,5 +1,4 @@
-import { Router, RequestHandler } from "express";
-import isAuthenticated from "../middlewares/isAuthenticated";
+import { Router } from "express";
 import { adminLogin, signupAdmin } from "../controllers/admin.controller";
 
 

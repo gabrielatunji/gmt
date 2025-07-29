@@ -5,16 +5,16 @@ import { User } from './user.model';
 import Sequelize from 'sequelize';
 
 interface CommentAttributes {
-    id: number;
+    commentID: number;
     postID: string;
     userID: number;
     body: string;
 }
 
-interface CommentCreationAttributes extends Omit<CommentAttributes, 'id'> {}
+interface CommentCreationAttributes extends Omit<CommentAttributes, 'commentID'> {}
 
 class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
-    public id!: number;
+    public commentID!: number;
     public postID!: string;
     public userID!: number;
     public body!: string;
@@ -24,7 +24,7 @@ class Comment extends Model<CommentAttributes, CommentCreationAttributes> implem
 }
 
 Comment.init({
-    id: {
+    commentID: {
     type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,

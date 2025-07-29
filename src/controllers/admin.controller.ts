@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import { Admin } from '../models/admin.model';
 import { hashPassword, confirmPassword } from '../utils/bcrypt';
-import { Post } from '../models/posts.model';
-import { Comment } from '../models/comment.model';
 import jwt, { Secret, JwtPayload } from 'jsonwebtoken'
 
 interface SignupRequestBody {
@@ -27,13 +25,11 @@ export const signupAdmin = async (req: Request<{}, {}, SignupRequestBody>, res: 
         const hashedPassword = await hashPassword(password);
 
         const newAdmin = await Admin.create({
-            firstName,
-            lastName,
-            email,
+            ...req.body,
             password: hashedPassword
         });
 
-        return res.status(201).json({ message: "Admin created successfully", admin: newAdmin });
+        return res.status(201).json({ message: "Admin created successfully", admin: newAdmin.firstName });
 
     } catch (error: any) {
         console.error("Error signing up admin:", error);
@@ -89,46 +85,3 @@ interface LoginRequestBody {
         return res.status(500).json({ message: "Failed to login", error: error.message });
     }
 };
-
-export const adminDeletePost = async (req: Request<{id:string}>, res: Response): Promise<Response> => {
-    const { id } = req.params;
-    try {
-        if (!id) {
-            return res.status(400).json({ message: "Post ID is required" });
-        }
-
-        const deletedPost = await Post.destroy({ where: { postID: id } });
-
-        if (deletedPost === 0) {
-            return res.status(404).json({ message: "Post not found" });
-        }
-
-        return res.status(200).json({ message: "Post deleted successfully" });
-
-    } catch (error: any) {
-        console.error("Error deleting post:", error);
-        return res.status(500).json({ message: "Failed to delete post", error: error.message });
-    }
-};
-
-export const adminDeleteComment = async (req: Request<{id:string}>, res: Response): Promise<Response> => {
-    const { id } = req.params;
-    try {
-        if (!id) {
-            return res.status(400).json({ message: "Comment ID is required" });
-        }
-
-        const deletedComment = await Comment.destroy({ where: { id } });
-
-        if (deletedComment === 0) {
-            return res.status(404).json({ message: "Comment not found" });
-        }
-
-        return res.status(200).json({ message: "Comment deleted successfully" });
-
-    } catch (error: any) {
-        console.error("Error deleting comment:", error);
-        return res.status(500).json({ message: "Failed to delete comment", error: error.message });
-    }
-};
-

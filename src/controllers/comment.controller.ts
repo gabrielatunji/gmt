@@ -10,8 +10,8 @@ interface MakeCommentBody {
     body: string;
 }
 
-export const makeComment = async (req: Request<{ id: string }, {}, MakeCommentBody>, res: Response): Promise<Response> => {
-    const { id: postID } = req.params;
+export const makeComment = async (req: Request<{ postID: string }, {}, MakeCommentBody>, res: Response): Promise<Response> => {
+    const { postID } = req.params;
     const { body } = req.body;
     const { user } = req as unknown as AuthenticatedRequest; 
     try {
@@ -42,24 +42,34 @@ export const makeComment = async (req: Request<{ id: string }, {}, MakeCommentBo
     }
 };
 
-export const deleteComment = async (req: Request<{id:string}, {}, {}>, res: Response): Promise<Response> => {
-    const { id } = req.params;
-    const { user } = req as unknown as AuthenticatedRequest; 
+
+export const deleteComment = async (req: Request<{commentID: string}, {}, {}>, res: Response): Promise<Response> => {
+    const { commentID } = req.params;
+    const { user } = req as unknown as AuthenticatedRequest;
+
     try {
-
-        const deletingComment = await Admin.findByPk(user.id)
-        if (!deletingComment){
-            return res.status(401).json({message: "Unauthorized"})
-        }
-
-        if (!id) {
+        if (!commentID) {
             return res.status(400).json({ message: "Comment ID is required" });
         }
 
-        const deletedComment = await Comment.destroy({ where: { id:id } });
+        const commentToDelete = await Comment.findByPk(commentID);
 
-        if (deletedComment === 0) {
+        if (!commentToDelete) {
             return res.status(404).json({ message: "Comment not found" });
+        }
+
+        const isAdmin = await Admin.findByPk(user.id);
+
+        
+        //Delete if user is an admin or owner of the comment
+        if (!isAdmin && commentToDelete.userID !== user.id) {
+            return res.status(403).json({ message: "Forbidden: You do not have permission to delete this comment." });
+        }
+
+        const deletedRowCount = await Comment.destroy({ where: { commentID } });
+
+        if (deletedRowCount === 0) {
+            return res.status(404).json({ message: "Comment not found or already deleted." });
         }
 
         return res.status(200).json({ message: "Comment deleted successfully" });
@@ -69,4 +79,3 @@ export const deleteComment = async (req: Request<{id:string}, {}, {}>, res: Resp
         return res.status(500).json({ message: "Failed to delete comment", error: error.message });
     }
 };
-
