@@ -19,6 +19,8 @@
     "@types/nodemon": "^1.19.6",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "backblaze-b2": "^1.7.1",
     "dotenv": "^17.2.1",
     "install": "^0.13.0",
@@ -54,6 +56,8 @@
     "rimraf": "^6.0.1",
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0"
   }
 }
