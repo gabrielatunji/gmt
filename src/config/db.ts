@@ -11,7 +11,7 @@ if (process.env.DATABASE_URL) {
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false, // for Railway SSL cert
+        rejectUnauthorized: false, 
       },
     },
   });
