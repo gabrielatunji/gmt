@@ -15,9 +15,9 @@
   },
   "production": {
     "username": "postgres",
-    "password": "admin",
-    "database": "testdb",
-    "host": "127.0.0.1",
+    "password": "AshckNKjGJpeiclxMVOUObpERlsxWqla",
+    "database": "gmtdb",
+    "host": "postgres.railway.internal",
     "dialect": "postgres"
   }
 }
