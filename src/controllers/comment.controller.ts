@@ -15,7 +15,7 @@ export const makeComment = async (req: Request<{ postID: string }, {}, MakeComme
     const { body } = req.body;
     const { user } = req as unknown as AuthenticatedRequest; 
     try {
-        const commentingUser = await User.findByPk(user.id)
+        const commentingUser = await User.findByPk(user.userID)
          if (!commentingUser) {
             return res.status(400).json({ message: "Login to add a comment" });
         }
@@ -31,7 +31,7 @@ export const makeComment = async (req: Request<{ postID: string }, {}, MakeComme
         
         const comment = await Comment.create({
             postID: postID,
-            userID: commentingUser.id,
+            userID: commentingUser.userID,
             body: body
         });
 
@@ -58,11 +58,11 @@ export const deleteComment = async (req: Request<{commentID: string}, {}, {}>, r
             return res.status(404).json({ message: "Comment not found" });
         }
 
-        const isAdmin = await Admin.findByPk(user.id);
+        const isAdmin = await Admin.findByPk(user.userID);
 
         
         //Delete if user is an admin or owner of the comment
-        if (!isAdmin && commentToDelete.userID !== user.id) {
+        if (!isAdmin && commentToDelete.userID !== user.userID) {
             return res.status(403).json({ message: "Forbidden: You do not have permission to delete this comment." });
         }
 

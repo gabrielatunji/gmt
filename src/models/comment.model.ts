@@ -7,7 +7,7 @@ import Sequelize from 'sequelize';
 interface CommentAttributes {
     commentID: number;
     postID: string;
-    userID: number;
+    userID: string;
     body: string;
 }
 
@@ -16,7 +16,7 @@ interface CommentCreationAttributes extends Omit<CommentAttributes, 'commentID'>
 class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
     public commentID!: number;
     public postID!: string;
-    public userID!: number;
+    public userID!: string;
     public body!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -29,21 +29,21 @@ Comment.init({
         autoIncrement: true,
         primaryKey: true,
   },
-    postID: { // Foreign key for Post
+    postID: { 
     type: DataTypes.STRING, 
     allowNull: false,
     references: {
             model: Post, // Reference the Post model
-            key: 'postID' // Reference the Post model's postID
+            key: 'postID'
     },
         onDelete: 'CASCADE' // Cascade delete if post is deleted
   },
     userID: { // Foreign key for User
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
         references: {
             model: User, // Reference the User model
-            key: 'id' // Reference the User model's id
+            key: 'userID' 
   }
     },
     body: {
@@ -57,7 +57,7 @@ Comment.init({
 });
 
 
-Comment.belongsTo(User, { foreignKey: 'userID', as: 'commenter' });
+// Comment.belongsTo(User, { foreignKey: 'userID', as: 'commenter' });
 
 export { Comment };
 

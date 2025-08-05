@@ -22,7 +22,7 @@ export const createPost = async (req: Request<{}, {}, NewPost>, res: Response): 
             return res.status(400).json({ message: 'Title and body are required' });
         }
 
-        const postingUser = await User.findByPk(user.id);
+        const postingUser = await User.findByPk(user.userID);
 
         if (!postingUser) {
             return res.status(404).json({ message: 'Login to make a post' });
@@ -56,7 +56,7 @@ export const createPost = async (req: Request<{}, {}, NewPost>, res: Response): 
         const postID = generatePostID();
         const newPost = await Post.create({
             postID: postID,
-            userID: postingUser.id,
+            userID: postingUser.userID,
             title,
             body,
             attachment: attachmentURL,
@@ -83,9 +83,9 @@ export const deletePost = async (req: Request<{ postID: string }, {}, {}>, res: 
             return res.status(404).json({message: 'Post not found'})
         }
 
-        const isAdmin = await Admin.findByPk(user.id)
+        const isAdmin = await Admin.findByPk(user.userID)
 
-        if (!isAdmin && postToDelete.userID !== user.id) {
+        if (!isAdmin && postToDelete.userID !== user.userID) {
             return res.status(403).json({ message: "Forbidden: You're not authorized to delete this post" });
         }
 

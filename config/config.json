@@ -1,4 +1,19 @@
+
 {
+  "production": {
+    "username": "postgres",
+    "password": "AshckNKjGJpeiclxMVOUObpERlsxWqla",
+    "database": "gmtdb",
+    "host": "postgres.railway.internal",
+    "dialect": "postgres",
+    "use_env_variable": "DATABASE_URL",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  },
   "development": {
     "username": "postgres",
     "password": "admin",
@@ -11,13 +26,6 @@
     "password": "admin",
     "database": "testdb",
     "host": "127.0.0.1",
-    "dialect": "postgres"
-  },
-  "production": {
-    "username": "postgres",
-    "password": "AshckNKjGJpeiclxMVOUObpERlsxWqla",
-    "database": "gmtdb",
-    "host": "postgres.railway.internal",
     "dialect": "postgres"
   }
 }

@@ -2,6 +2,7 @@ import passport from 'passport';
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid'; 
+import { v7 as uuidv7 } from 'uuid';
 import { User } from '../models/user.model';
 
 dotenv.config();
@@ -24,10 +25,11 @@ passport.use(new GitHubStrategy({
                 // GitHub doesn't always provide email, handle the case where it's missing
                 const email = profile.emails?.[0].value;
                 const randomPassword = uuidv4(); 
-                const userId = uuidv4();
+                const userID = 'user-'+uuidv7();
 
 
                const newUser = await User.create({
+                    userID: userID,
                     githubID: profile.id,
                     firstName: profile.displayName ? profile.displayName.split(' ')[0] : 'Github User', // Use displayName if available
                     lastName: profile.displayName ? profile.displayName.split(' ').slice(1).join(' ') : '',

@@ -7,10 +7,11 @@ import Sequelize from 'sequelize';
 // Define the attributes interface
 interface PostAttributes {
     postID: string; 
-    userID: number; 
+    userID: string; 
     title: string;
     body: string;
     attachment: string | null;
+    tags: string[] | null;
 }
 
 // Creation attributes interface - postID is NOT omitted
@@ -19,10 +20,11 @@ interface PostCreationAttributes extends PostAttributes {}
 // Extend the Model class
 class Post extends Model<PostAttributes, PostCreationAttributes> implements PostAttributes {
     public postID!: string; 
-    public userID!: number; 
+    public userID!: string; 
     public title!: string;
     public body!: string;
     public attachment!: string | null;
+    public tags!: string[] | null;
 
     // timestamps!
     public readonly createdAt!: Date;
@@ -48,11 +50,11 @@ Post.init({
         primaryKey: true,
     },
     userID: { 
-        type: DataTypes.INTEGER, 
+        type: DataTypes.STRING, 
         allowNull: false,
         references: {
-            model: User, // Reference the User model
-            key: 'id'   // Reference the User model's id
+            model: User, // Reference the User model for foreign key
+            key: 'userID'  
         }
     },
     title: {
@@ -67,6 +69,10 @@ Post.init({
         type: DataTypes.STRING,
         allowNull: true
     },
+    tags: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true
+    }
 },
 {
     sequelize,
@@ -74,9 +80,9 @@ Post.init({
     timestamps: true
 });
 
-// Define the association (one-to-many: User has many Posts)
-Post.belongsTo(User, { foreignKey: 'userID', as: 'author' }); // Added as: 'author'
-Post.hasMany(Comment, { foreignKey: 'postID', as: 'comments' });
+// // Define the association (one-to-many: User has many Posts)
+// Post.belongsTo(User, { foreignKey: 'userID', as: 'author' }); // Added as: 'author'
+// Post.hasMany(Comment, { foreignKey: 'postID', as: 'comments' });
 
 export { Post };
 

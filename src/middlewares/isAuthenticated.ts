@@ -7,7 +7,7 @@ dotenv.config();
 
 // Custom type for authenticated user data
 export interface AuthenticatedUser {
-  id: number;
+  userID: string;
   email: string;
   firstName: string;
 }
@@ -45,7 +45,7 @@ const isAuthenticated = async (req: AuthenticatedRequest, res: Response, next:Ne
 
     // Attach minimal user info to req.user
     req.user = {
-      id: user.id,
+      userID: user.userID,
       email: user.email,
       firstName: user.firstName,
     };

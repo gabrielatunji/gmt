@@ -6,36 +6,35 @@ import Sequelize from 'sequelize';
 
 // Define the attributes interface
 interface UserAttributes {
-    id: number;
+    userID: string;
     googleID: string | null;
     githubID: string | null;
     email: string;
     password: string;
     firstName: string;
     lastName: string | null;
-    paymentStatus: string | null;
-    paymentDate: Date | null;
+    bio: string | null;
+    profilePicture: string | null;
     isSubscribed: boolean | null;
-    tx_Ref: string | null;
+    nextSubscription: Date | null;
 }
 
 // Creation attributes interface
-interface UserCreationAttributes extends Omit<UserAttributes, 'id'> {}
+interface UserCreationAttributes extends UserAttributes {}
 
 // Extend the Model class
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-    public id!: number;
+    public userID!: string;
     public googleID!: string | null;
     public githubID!: string | null;
     public email!: string;
     public password!: string;
     public firstName!: string;
     public lastName!: string | null;
-    public paymentStatus!: string | null;
+    public bio!: string | null;
+    public profilePicture!: string | null;
     public isSubscribed!: boolean | null;
-    public paymentDate!: Date | null;
-    public tx_Ref!: string| null;
-    public subscriptionAmount!: number; 
+    public nextSubscription!: Date | null;
 
     // timestamps!
     public readonly createdAt!: Date;
@@ -65,10 +64,9 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 }
 
 User.init({
-    id: {
-        type: DataTypes.INTEGER,
+    userID: {
+        type: DataTypes.STRING,
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false
     },
     googleID: {
@@ -95,31 +93,37 @@ User.init({
         type: DataTypes.STRING,
         allowNull: true
     },
-    paymentStatus: {
-        type: DataTypes.ENUM,
-        allowNull: true,
-        defaultValue: 'Not Paid',
-        values: ['Not Paid', 'Initiated', 'Subscribed']
+    bio: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    profilePicture: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     isSubscribed: {
         type: DataTypes.BOOLEAN,
         defaultValue: 'false',
     },
-    paymentDate: {
+    nextSubscription: {
         type: DataTypes.DATE,
         allowNull: true
-    },
-    tx_Ref: {
-        type: DataTypes.STRING,
-        allowNull: true
     }
-
 
 },
 {
     sequelize,
     tableName: 'users',
     timestamps: true
+});
+
+User.hasMany(Post, {
+  foreignKey: 'userID',
+  as: 'posts'
+});
+User.hasMany(Comment, {
+    foreignKey: 'userID',
+    as: 'comments'
 });
 
 export { User };

@@ -2,7 +2,8 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 import { User } from '../models/user.model';
-import { v4 as uuidv4} from 'uuid'; 
+import { v7 as uuidv7} from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
@@ -16,13 +17,14 @@ passport.use(new GoogleStrategy({
         const randomPassword = uuidv4(); 
         try {
             const existingUser = await User.findOne({ where: { googleID: profile.id } });
-            const userId = uuidv4();
+            const userID = "user-"+uuidv7();
 
 
             if (existingUser) {
                 return done(null, existingUser);
             } else {
                 const newUser = await User.create({
+                    userID: userID,
                     googleID: profile.id,
                     firstName: profile.name?.givenName,
                     lastName: profile.name?.familyName,

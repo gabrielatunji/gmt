@@ -5,6 +5,7 @@ import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { generatePaymentLink } from '../services/flutterwave';
 import { AuthenticatedRequest } from '../middlewares/isAuthenticated';
+import { v7 as uuidv7 } from 'uuid'; 
 
 dotenv.config();
 
@@ -33,9 +34,11 @@ export const userSignup = async (req: Request<{}, {}, SignupRequestBody>, res: R
         }
 
         const hashedPassword = await hashPassword(password);
+        const userID = 'user-'+uuidv7();
 
         const newUser = await User.create({
             ...req.body,
+            userID: userID,
             password: hashedPassword,
         });
 
@@ -73,7 +76,7 @@ export const userLogin = async (req: Request<{}, {}, LoginRequestBody>, res: Res
 
         
         const payload: JwtPayload = {
-            id: user.id,
+            id: user.userID,
             email: user.email,
             firstName: user.firstName,
         };
@@ -111,7 +114,7 @@ export const userSubscriptions = async (req: Request, res: Response): Promise<Re
         if(!user){
             return res.status(404).json({message: 'Unauthorized'})
         }
-        const payingUser = await User.findByPk(user.id);
+        const payingUser = await User.findByPk(user.userID);
         if (!payingUser) {
             return res.status(404).json({ message: 'User associated with this token no longer exists.' });
         }
@@ -123,8 +126,6 @@ export const userSubscriptions = async (req: Request, res: Response): Promise<Re
             email: user.email,
             amount: amount, // Use the amount from the request body
         });
-
-        payingUser.paymentStatus = 'Initiated';
         await payingUser.save();
 
         return res.status(200).json({ message: 'Payment initiated successfully', paymentLink: paymentLink });
