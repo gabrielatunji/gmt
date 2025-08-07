@@ -37,7 +37,7 @@ class Post extends Model<PostAttributes, PostCreationAttributes> implements Post
     public addComment!: Sequelize.HasManyAddAssociationMixin<Comment, number>;
     public addComments!: Sequelize.HasManyAddAssociationsMixin<Comment, number>;
     public removeComment!: Sequelize.HasManyRemoveAssociationMixin<Comment, number>;
-    public removeComments!: Sequelize.HasManyRemoveAssociationsMixin<Comment, number>;
+    public removeComments!: Sequelize.HasManyRemoveAssociationMixin<Comment, number>;
     public setComments!: Sequelize.HasManySetAssociationsMixin<Comment, number>;
 
 
@@ -47,6 +47,7 @@ class Post extends Model<PostAttributes, PostCreationAttributes> implements Post
 Post.init({
     postID: {
         type: DataTypes.STRING, 
+        allowNull: false, 
         primaryKey: true,
     },
     userID: { 
@@ -80,7 +81,7 @@ Post.init({
     timestamps: true
 });
 
-// // Define the association (one-to-many: User has many Posts)
+// Define the association (one-to-many: User has many Posts)
 // Post.belongsTo(User, { foreignKey: 'userID', as: 'author' }); // Added as: 'author'
 // Post.hasMany(Comment, { foreignKey: 'postID', as: 'comments' });
 
