@@ -13,7 +13,7 @@ export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {
     console.log(payload); 
 
     if (payload.event === 'charge.completed') {
-      const txRef = payload.data.tx_Ref;
+      const txRef = payload.data.tx_ref;
       const status = payload.data.status;
       const amount = payload.data.amount;
       const email = payload.data.customer.email;
