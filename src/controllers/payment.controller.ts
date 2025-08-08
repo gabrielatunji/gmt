@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { User } from '../models/user.model'; 
+import { ProcessedTransaction } from "../models/processedtxns.model";
 
+
+
+//Learnt about idempotency and tried to make the webhook handler idempotent
 export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {
   try {
     const signature = req.headers['verif-hash'];
@@ -12,14 +16,30 @@ export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {
     const payload = req.body;
     console.log(payload); 
 
+     if (payload.event !== 'charge.completed') {
+      return res.status(200).send('Event ignored');
+    }
+
     if (payload.event === 'charge.completed') {
       const txRef = payload.data.tx_ref;
       const status = payload.data.status;
       const amount = payload.data.amount;
       const email = payload.data.customer.email;
 
-        if (status === 'successful') {
+        if (status !== 'successful') {
+            console.log('Payment not successful:', payload.data);
+            return res.status(200).send('Payment not successful');
+        }
 
+        //check if transaction is already processed
+        const alreadyProcessed = await ProcessedTransaction.findOne({ where: { txRef } });
+
+        if (alreadyProcessed) {
+            console.log('Transaction already processed:', txRef);
+            return res.status(200).send('Transaction already processed');
+        }
+
+        if (status === 'successful') {
             const payingUser = await User.findOne({ where: { subscriptionTxRef: txRef } }); 
             console.log(payingUser); 
             if (!payingUser) { 
@@ -38,6 +58,11 @@ export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {
             }
 
             await payingUser.save();
+
+            await ProcessedTransaction.create({ 
+                txRef,
+                userID: payingUser.userID
+            });
 
             console.log(`Payment verified and recorded for ${email}, amount paid: ${amount}`);
             return res.status(200).json({ success: true });
