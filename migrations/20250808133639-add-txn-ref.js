@@ -178,42 +178,7 @@ module.exports = {
         },
     });
 
-     // Define Associations after tables are created
-     await queryInterface.addConstraint('posts', {
-        fields: ['userID'],
-        type: 'foreign key',
-        name: 'posts_userID_fkey', // a unique name for the constraint
-        references: {
-          table: 'users',
-          field: 'userID'
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-      });
-
-      await queryInterface.addConstraint('comments', {
-        fields: ['postID'],
-        type: 'foreign key',
-        name: 'comments_postID_fkey', // a unique name for the constraint
-        references: {
-          table: 'posts',
-          field: 'postID'
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-      });
-
-      await queryInterface.addConstraint('comments', {
-        fields: ['userID'],
-        type: 'foreign key',
-        name: 'comments_userID_fkey', // a unique name for the constraint
-        references: {
-          table: 'users',
-          field: 'userID'
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-      });
+  
   },
 
   async down(queryInterface, Sequelize) {
