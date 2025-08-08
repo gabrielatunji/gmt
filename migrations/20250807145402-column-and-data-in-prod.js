@@ -8,6 +8,7 @@ module.exports = {
         type: Sequelize.STRING,
         primaryKey: true,
         allowNull: false,
+        unique: true,
       },
       googleID: {
         type: Sequelize.STRING,
@@ -20,6 +21,7 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
         allowNull: true,
+        unique: true,
       },
       password: {
         type: Sequelize.STRING,
@@ -64,6 +66,7 @@ module.exports = {
         type: Sequelize.STRING,
         primaryKey: true,
         allowNull: false,
+        unique: true,
       },
       userID: {
         type: Sequelize.STRING,
