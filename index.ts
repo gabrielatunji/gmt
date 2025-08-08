@@ -5,6 +5,7 @@ import userRouter from './src/routers/user.route';
 import postRouter from './src/routers/post.route';
 import commentRouter from './src/routers/comment.route';
 import adminRouter from './src/routers/admin.route'; 
+import paymentRouter from './src/routers/payment.route';
 import swaggerUi from 'swagger-ui-express'; // Import swaggerUi
 import swaggerSpec from './src/config/swagger'; // Import swaggerSpec
 
@@ -28,6 +29,7 @@ app.use('/api/v1/user', userRouter);
 app.use('/api/v1/post', postRouter); 
 app.use('/api/v1/admin', adminRouter); 
 app.use('/api/v1/comments/', commentRouter); 
+app.use('/api/v1/payment', paymentRouter);
 
 app.listen(PORT, () => {
     connectDB(); 

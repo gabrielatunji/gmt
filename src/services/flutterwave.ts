@@ -8,6 +8,7 @@ dotenv.config();
 interface GeneratePaymentLinkPayload {
   email: string;
   amount: number;
+  tx_Ref: string;
 }
 const generatePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise<string> => {
   try {
@@ -16,13 +17,12 @@ const generatePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise
             throw new Error("User not found");
         }
 
-    const tx_ref = uuidv4();
     const amount = payload.amount;
 
         const response = await axios.post(
             'https://api.flutterwave.com/v3/payments',
             {
-                tx_ref,
+                tx_Ref: payload.tx_Ref,
                 amount,
                 currency: 'NGN',
                 redirect_url: 'https://gmt.onrender.com', // frontend confirmation url

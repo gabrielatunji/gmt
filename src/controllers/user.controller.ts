@@ -121,18 +121,24 @@ export const userSubscriptions = async (req: Request, res: Response): Promise<Re
 
         // Access the subscription amount from the request body
         const { amount } = req.body as PaymentRequestBody;
-        
+
+        const tx_Ref = 'GMT-' + uuidv7();
+
         const paymentLink = await generatePaymentLink({
             email: user.email,
-            amount: amount, // Use the amount from the request body
+            amount, 
+            tx_Ref
         });
+
+        payingUser.paymentTxRef = tx_Ref;
         await payingUser.save();
 
-        return res.status(200).json({ message: 'Payment initiated successfully', paymentLink: paymentLink });
+        return res.status(200).json({ message: 'Payment initiated successfully', paymentLink });
 
     } catch (error: any) {
         console.error("Error initiating payment:", error);
         return res.status(500).json({ message: "Failed to initiate payment", error: error.message });
     }
 };
+
 

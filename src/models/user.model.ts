@@ -16,6 +16,7 @@ interface UserAttributes {
     bio: string | null;
     profilePicture: string | null;
     isSubscribed: boolean | null;
+    paymentTxRef: string | null;
     nextSubscription: Date | null;
 }
 
@@ -34,6 +35,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     public bio!: string | null;
     public profilePicture!: string | null;
     public isSubscribed!: boolean | null;
+    public paymentTxRef!: string | null;
     public nextSubscription!: Date | null;
 
     // timestamps!
@@ -104,6 +106,10 @@ User.init({
     isSubscribed: {
         type: DataTypes.BOOLEAN,
         defaultValue: 'false',
+    },
+    paymentTxRef: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     nextSubscription: {
         type: DataTypes.DATE,
