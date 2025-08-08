@@ -22,7 +22,7 @@ const generatePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise
         const response = await axios.post(
             'https://api.flutterwave.com/v3/payments',
             {
-                tx_Ref: payload.tx_Ref,
+                tx_ref: payload.tx_Ref,
                 amount,
                 currency: 'NGN',
                 redirect_url: 'https://gmt.onrender.com', // frontend confirmation url

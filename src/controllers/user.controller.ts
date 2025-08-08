@@ -14,10 +14,6 @@ interface SignupRequestBody {
     password: string;
     firstName: string;
     lastName: string;
-    paymentStatus?: string;
-    paymentDate?: Date;
-    isSubscribed?: boolean;
-    subscriptionTxRef?: string;
 }
 
 
