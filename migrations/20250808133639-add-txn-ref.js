@@ -1,0 +1,225 @@
+'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable('users', {
+      userID: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+        allowNull: false,
+      },
+      googleID: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      githubID: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      firstName: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      lastName: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      bio: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      profilePicture: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      isSubscribed: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      subscriptionTxRef: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      nextSubscription: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+    });
+
+    await queryInterface.createTable('posts', {
+      postID: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+        allowNull: false,
+      },
+      userID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'userID',
+        },
+        onDelete: 'CASCADE',
+      },
+      title: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      body: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      attachment: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      tags: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: true,
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+    });
+
+    await queryInterface.createTable('comments', {
+      commentID: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      postID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        references: {
+          model: 'posts',
+          key: 'postID',
+        },
+        onDelete: 'CASCADE',
+      },
+      userID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'userID',
+        },
+      },
+      body: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+    });
+
+     await queryInterface.createTable('admins', {
+        id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        email: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        password: {
+            type: Sequelize.STRING,
+            allowNull:false
+        },
+        firstName: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        lastName: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        role: {
+            type: Sequelize.STRING,
+            allowNull: false,
+            defaultValue: 'ADMIN'
+        },
+        createdAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+        },
+        updatedAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+        },
+    });
+
+     // Define Associations after tables are created
+     await queryInterface.addConstraint('posts', {
+        fields: ['userID'],
+        type: 'foreign key',
+        name: 'posts_userID_fkey', // a unique name for the constraint
+        references: {
+          table: 'users',
+          field: 'userID'
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      });
+
+      await queryInterface.addConstraint('comments', {
+        fields: ['postID'],
+        type: 'foreign key',
+        name: 'comments_postID_fkey', // a unique name for the constraint
+        references: {
+          table: 'posts',
+          field: 'postID'
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      });
+
+      await queryInterface.addConstraint('comments', {
+        fields: ['userID'],
+        type: 'foreign key',
+        name: 'comments_userID_fkey', // a unique name for the constraint
+        references: {
+          table: 'users',
+          field: 'userID'
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      });
+  },
+
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('comments');
+    await queryInterface.dropTable('posts');
+    await queryInterface.dropTable('users');
+     await queryInterface.dropTable('admins');
+  },
+};

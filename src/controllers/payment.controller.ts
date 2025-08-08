@@ -20,7 +20,7 @@ export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {
 
         if (status === 'successful') {
 
-            const payingUser = await User.findOne({ where: { paymentTxRef: txRef } }); 
+            const payingUser = await User.findOne({ where: { subscriptionTxRef: txRef } }); 
             console.log(payingUser); 
             if (!payingUser) { 
                     return res.status(404).send('User not found');

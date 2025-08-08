@@ -130,7 +130,7 @@ export const userSubscriptions = async (req: Request, res: Response): Promise<Re
             tx_Ref
         });
 
-        payingUser.paymentTxRef = tx_Ref;
+        payingUser.subscriptionTxRef = tx_Ref;
         await payingUser.save();
 
         return res.status(200).json({ message: 'Payment initiated successfully', paymentLink });
