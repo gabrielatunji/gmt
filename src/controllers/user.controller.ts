@@ -17,7 +17,7 @@ interface SignupRequestBody {
     paymentStatus?: string;
     paymentDate?: Date;
     isSubscribed?: boolean;
-    tx_Ref?: string;
+    subscriptionTxRef?: string;
 }
 
 
