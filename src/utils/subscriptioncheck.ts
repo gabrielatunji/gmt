@@ -23,7 +23,7 @@ export function scheduleSubscriptionCheck(): void {
     if (lapsedUsers.length > 0) {
       console.log(`Found ${lapsedUsers.length} lapsed subscriptions.`);
 
-      // Update isSubscribed to false for these users
+      // Update isSubscribed to false for these users 
       await Promise.all(
           lapsedUsers.map(async (user: User) => {
           user.isSubscribed = false;

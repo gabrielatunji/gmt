@@ -13,8 +13,8 @@ export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {
         return res.status(401).send('Unauthorized - Invalid signature');
     }
 
-    const payload = req.body;
-    console.log(payload); 
+    const payload = req.body; 
+    //console.log(payload) //DO NOT USE IN PROD, log in development ONLY
 
      if (payload.event !== 'charge.completed') {
       return res.status(200).send('Event ignored');
@@ -41,7 +41,6 @@ export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {
 
         if (status === 'successful') {
             const payingUser = await User.findOne({ where: { subscriptionTxRef: txRef } }); 
-            console.log(payingUser); 
             if (!payingUser) { 
                     return res.status(404).send('User not found');
                 }
@@ -64,7 +63,7 @@ export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {
                 userID: payingUser.userID
             });
 
-            console.log(`Payment verified and recorded for ${email}, amount paid: ${amount}`);
+            console.log(`Payment verified and recorded for ${payingUser.email}, amount paid: ${amount}`);
             return res.status(200).json({ success: true });
         }
     }
