@@ -213,3 +213,5 @@ module.exports = {
      await queryInterface.dropTable('processedTransactions');
   },
 };
+
+

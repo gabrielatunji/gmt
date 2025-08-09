@@ -6,8 +6,9 @@ import postRouter from './src/routers/post.route';
 import commentRouter from './src/routers/comment.route';
 import adminRouter from './src/routers/admin.route'; 
 import paymentRouter from './src/routers/payment.route';
-import swaggerUi from 'swagger-ui-express'; // Import swaggerUi
-import swaggerSpec from './src/config/swagger'; // Import swaggerSpec
+import swaggerUi from 'swagger-ui-express'; 
+import swaggerSpec from './src/config/swagger';
+import { scheduleSubscriptionCheck } from './src/utils/subscriptioncheck';
 
 
 dotenv.config(); 
@@ -33,6 +34,7 @@ app.use('/api/v1/payment', paymentRouter);
 
 app.listen(PORT, () => {
     connectDB(); 
+    scheduleSubscriptionCheck(); 
     console.log(`Server is running on port ${PORT}`);
     console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`); // Display the swagger documentation path
 });
