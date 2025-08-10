@@ -3,7 +3,8 @@ import { User } from '../models/user.model';
 import { hashPassword, confirmPassword } from '../utils/bcrypt';
 import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { generatePaymentLink } from '../services/flutterwave';
+import { flutterwavePaymentLink } from '../services/flutterwave';
+import { PaystackPaymentLink } from '../services/paystack';
 import { AuthenticatedRequest } from '../middlewares/isAuthenticated';
 import { v7 as uuidv7 } from 'uuid'; 
 
@@ -120,16 +121,22 @@ export const userSubscriptions = async (req: Request, res: Response): Promise<Re
 
         const tx_Ref = 'GMT-' + uuidv7();
 
-        const paymentLink = await generatePaymentLink({
+        const FlutterwaveLink = await flutterwavePaymentLink({
             email: user.email,
             amount, 
             tx_Ref
         });
 
+        const PaystackLink = await PaystackPaymentLink({
+            email: user.email, 
+            amount, 
+            tx_Ref
+        }); 
+
         payingUser.subscriptionTxRef = tx_Ref;
         await payingUser.save();
 
-        return res.status(200).json({ message: 'Payment initiated successfully', paymentLink });
+        return res.status(200).json({ message: 'Payment initiated successfully', Flutterwave: FlutterwaveLink, Paystack: PaystackLink });
 
     } catch (error: any) {
         console.error("Error initiating payment:", error);

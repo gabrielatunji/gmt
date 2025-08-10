@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import axios from 'axios';
 import { User } from '../models/user.model';
-import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config(); 
 
@@ -10,7 +9,8 @@ interface GeneratePaymentLinkPayload {
   amount: number;
   tx_Ref: string;
 }
-const generatePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise<string> => {
+
+const flutterwavePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise<string> => {
   try {
     const user = await User.findOne({ where: { email: payload.email } });
         if (!user) {
@@ -44,12 +44,12 @@ const generatePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise
             }
         );
 
-        console.log('Payment link generated:', (response.data as any).data.link);
+        console.log('Flutterwave Payment link generated:', (response.data as any).data.link);
         return (response.data as any).data.link;
   } catch (err: any) {
-        console.error('Error generating payment link:', err.response?.data || err.message);
+        console.error('Error generating Flutterwave Payment link:', err.response?.data || err.message);
         throw err;
     }
 };
 
-export { generatePaymentLink };
+export { flutterwavePaymentLink };

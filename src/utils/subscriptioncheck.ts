@@ -4,9 +4,10 @@ import { Op } from 'sequelize';
 
 export function scheduleSubscriptionCheck(): void {
 // Schedule tasks to be run on the server.
-  cron.schedule('0 0 * * *', async (): Promise<void> => {
-    console.log('Running cron job to check for lapsed subscriptions...'); // so I don't clear subscription hours before its actually midnight for the user.
-
+  cron.schedule('0 0 * * *', async (): Promise<void> => { //Run cron job at midnight everyday, 
+    console.log('Running cron job to check for lapsed subscriptions...'); // I need to find a way to convert dates to user's locale,
+                                                                          // so I don't clear subscription hours before its actually midnight for the
+                                                                          // user. Cron job will run midnight server time. 
   try {
       const now: Date = new Date();
 
@@ -24,7 +25,7 @@ export function scheduleSubscriptionCheck(): void {
       console.log(`Found ${lapsedUsers.length} lapsed subscriptions.`);
 
       // Update isSubscribed to false for these users 
-      await Promise.all(
+      await Promise.all( //promise.all runs the query in parallel, faster process
           lapsedUsers.map(async (user: User) => {
           user.isSubscribed = false;
           await user.save();

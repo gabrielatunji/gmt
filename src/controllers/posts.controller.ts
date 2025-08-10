@@ -69,24 +69,64 @@ export const createPost = async (req: Request<{}, {}, NewPost>, res: Response): 
     }
 };
 
+interface EditPost {
+    newTitle?: string;
+    newBody?: string;
+    newAttachment?: string | null;
+}
+
+export const editPost = async (req: Request<{ postID: string }, {}, EditPost>,res: Response): Promise<Response> => {
+    const { postID } = req.params;
+    const { user } = req as unknown as AuthenticatedRequest;
+    const { newTitle, newBody, newAttachment } = req.body;
+
+    try {
+        if (!postID) {
+            return res.status(400).json({ message: 'PostID is required' });
+        }
+
+        const postToEdit = await Post.findByPk(postID);
+
+        if (!postToEdit) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        if (postToEdit.userID !== user.userID) {
+            return res.status(401).json({ message: "Unauthorized: You're unauthorized to edit this post" });
+        }
+
+        // Only update fields that are provided
+        if (typeof newTitle !== 'undefined') postToEdit.title = newTitle;
+        if (typeof newBody !== 'undefined') postToEdit.body = newBody;
+        if (typeof newAttachment !== 'undefined') postToEdit.attachment = newAttachment;
+
+        await postToEdit.save();
+
+        return res.status(200).json({ message: "Post edited successfully", post: postToEdit });
+    } catch (error: any) {
+        console.error("Error editing post:", error);
+        return res.status(500).json({ message: 'Failed to edit post', error: error.message });
+    }
+};
+
 export const deletePost = async (req: Request<{ postID: string }, {}, {}>, res: Response): Promise<Response> => {
     const { postID } = req.params;
     const { user } = req as unknown as AuthenticatedRequest;
     try {
         if(!postID){
-            return res.status(401).json({message: 'PostID is required'})
+            return res.status(400).json({message: 'PostID is required'});
         }
 
-        const postToDelete = await Post.findByPk(postID)
+        const postToDelete = await Post.findByPk(postID);
 
         if(!postToDelete){
-            return res.status(404).json({message: 'Post not found'})
+            return res.status(404).json({message: 'Post not found'});
         }
 
-        const isAdmin = await Admin.findByPk(user.userID)
+        const isAdmin = await Admin.findByPk(user.userID); 
 
         if (!isAdmin && postToDelete.userID !== user.userID) {
-            return res.status(403).json({ message: "Forbidden: You're not authorized to delete this post" });
+            return res.status(401).json({ message: "Unathorized: You're not authorized to delete this post" });
         }
 
         const deletedPost = await Post.destroy({ where: { postID } });
@@ -148,3 +188,4 @@ export const getSinglePostByID = async (req: Request<{ postID: string }>, res: R
         return res.status(500).json({ message: 'Failed to fetch post', error: error.message });
     }
 };
+
