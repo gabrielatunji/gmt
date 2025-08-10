@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { handleFlutterwaveWebhook } from "../controllers/payment.controller";
+import { handleFlutterwaveWebhook, handlePaystackWebhook } from "../controllers/payment.controller";
 const paymentRouter = Router();
 
 paymentRouter.post("/flutterwave/webhook", handleFlutterwaveWebhook);
+paymentRouter.post("/paystack/webhook", handlePaystackWebhook); 
 
 export default paymentRouter;
