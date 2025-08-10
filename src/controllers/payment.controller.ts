@@ -71,9 +71,28 @@ export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {
 
 export const handlePaystackWebhook = async (req: Request, res: Response) => {
   try {
+
+    const PaystackIPs = [
+            "52.31.139.75",
+            "52.49.173.169",
+            "52.214.14.220"
+          ]; 
+
+    // Get the IP address of the request origin
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress; //should simply be req.socket.remotAddress but 
+    const clientIP = typeof ip === 'string' ? ip.split(',')[0].trim() : (ip ? ip[0].trim() : null); //'x.forwarded-for' takes care of cases where a proxy is used
+
+        // Whitelist Paystack IP addresses
+      if (!clientIP || !PaystackIPs.includes(clientIP)) {
+          console.warn(`Unauthorized access: IP ${clientIP} is not whitelisted.`);
+          return res.status(403).send('Forbidden - IP not whitelisted');
+        }
+
+
     // Verify Paystack signature
     const secret = process.env.PAYSTACK_SECRET_KEY; 
     const hash = crypto.createHmac('sha512', secret!).update(JSON.stringify(req.body)).digest('hex');
+
 
         if (hash !== req.headers['x-paystack-signature']) {
               return res.status(401).send('Unauthorized - Invalid signature');
