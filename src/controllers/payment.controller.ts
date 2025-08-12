@@ -1,7 +1,83 @@
 import { Request, Response } from "express";
 import { User } from '../models/user.model'; 
 import { ProcessedTransaction } from "../models/processedtxns.model";
+import { AuthenticatedRequest } from "../middlewares/isAuthenticated";
+import { FlutterwavePaymentLink } from "../services/flutterwave";
+import { PaystackPaymentLink } from "../services/paystack";
+import CircuitBreaker  from 'opossum'; 
+import { v7 as uuidv7 } from 'uuid'; 
 import crypto from 'crypto';
+
+
+// Define the PaymentRequestBody interface for the request body
+interface PaymentRequestBody {
+    amount: number;
+}
+
+
+export const userSubscriptions = async (req: Request, res: Response): Promise<Response> => {
+    const { user } = req as AuthenticatedRequest; //from isAuthenticated middleware
+
+    try {
+            if(!user){
+              return res.status(404).json({message: 'Unauthorized'})
+            }
+        const payingUser = await User.findByPk(user.userID);
+            if (!payingUser) {
+              return res.status(404).json({ message: 'User not found' });
+            }
+
+        // Access the subscription amount from the request body
+        const { amount } = req.body as PaymentRequestBody;
+
+        const tx_Ref = 'GMT-' + uuidv7();
+
+        const FlutterwaveLink = await FlutterwavePaymentLink({
+            email: user.email,
+            amount, 
+            tx_Ref
+        });
+
+        const PaystackLink = await PaystackPaymentLink({
+            email: user.email, 
+            amount, 
+            tx_Ref
+        }); 
+
+        //   //Paystack Circuit Breaker
+        // const paystackOptions = {
+        //       timeout: 3000, // If paystack function doesn't complete within 3 seconds, reject it
+        //       errorThresholdPercentage: 50, // When 50% of requests to paystack fail, trip the circuit
+        //       resetTimeout: 10000 // After 10 seconds, try again.
+        // };
+
+        // const paystackCircuitBreaker = new CircuitBreaker(PaystackPaymentLink, paystackOptions);
+
+        // // Flutterwave Circuit Breaker
+        // const flutterwaveOptions = {
+        //         timeout: 3000,
+        //         errorThresholdPercentage: 50,
+        //         resetTimeout: 10000
+        // };
+
+        // const flutterwaveCircuitBreaker = new CircuitBreaker(FlutterwavePaymentLink, flutterwaveOptions);
+
+
+
+        payingUser.subscriptionTxRef = tx_Ref;
+        await payingUser.save();
+
+        return res.status(200).json({ message: 'Payment initiated successfully', Flutterwave: FlutterwaveLink, Paystack: PaystackLink });
+
+      } catch (error: any) {
+        console.error("Error initiating payment:", error);
+        return res.status(500).json({ message: "Failed to initiate payment", error: error.message });
+      }
+};
+
+
+
+
 
 //Learnt about idempotency and tried to make the webhook handler idempotent
 export const handleFlutterwaveWebhook = async (req: Request, res: Response) => {

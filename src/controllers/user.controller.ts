@@ -3,8 +3,6 @@ import { User } from '../models/user.model';
 import { hashPassword, confirmPassword } from '../utils/bcrypt';
 import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { flutterwavePaymentLink } from '../services/flutterwave';
-import { PaystackPaymentLink } from '../services/paystack';
 import { AuthenticatedRequest } from '../middlewares/isAuthenticated';
 import { v7 as uuidv7 } from 'uuid'; 
 
@@ -97,51 +95,4 @@ export const userLogin = async (req: Request<{}, {}, LoginRequestBody>, res: Res
         return res.status(500).json({ message: "Failed to login", error: error.message });
     }
 };
-
-// Define the PaymentRequestBody interface for the request body
-interface PaymentRequestBody {
-    amount: number;
-}
-
-// Use the AuthenticatedRequest interface for the Request object itself
-export const userSubscriptions = async (req: Request, res: Response): Promise<Response> => {
-    const { user } = req as AuthenticatedRequest; 
-
-    try {
-        if(!user){
-            return res.status(404).json({message: 'Unauthorized'})
-        }
-        const payingUser = await User.findByPk(user.userID);
-        if (!payingUser) {
-            return res.status(404).json({ message: 'User associated with this token no longer exists.' });
-        }
-
-        // Access the subscription amount from the request body
-        const { amount } = req.body as PaymentRequestBody;
-
-        const tx_Ref = 'GMT-' + uuidv7();
-
-        const FlutterwaveLink = await flutterwavePaymentLink({
-            email: user.email,
-            amount, 
-            tx_Ref
-        });
-
-        const PaystackLink = await PaystackPaymentLink({
-            email: user.email, 
-            amount, 
-            tx_Ref
-        }); 
-
-        payingUser.subscriptionTxRef = tx_Ref;
-        await payingUser.save();
-
-        return res.status(200).json({ message: 'Payment initiated successfully', Flutterwave: FlutterwaveLink, Paystack: PaystackLink });
-
-    } catch (error: any) {
-        console.error("Error initiating payment:", error);
-        return res.status(500).json({ message: "Failed to initiate payment", error: error.message });
-    }
-};
-
 

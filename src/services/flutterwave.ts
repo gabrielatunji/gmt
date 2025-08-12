@@ -10,7 +10,7 @@ interface GeneratePaymentLinkPayload {
   tx_Ref: string;
 }
 
-const flutterwavePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise<string> => {
+const FlutterwavePaymentLink = async (payload: GeneratePaymentLinkPayload): Promise<string> => {
   try {
     const user = await User.findOne({ where: { email: payload.email } });
         if (!user) {
@@ -44,12 +44,12 @@ const flutterwavePaymentLink = async (payload: GeneratePaymentLinkPayload): Prom
             }
         );
 
-        console.log('Flutterwave Payment link generated:', (response.data as any).data.link);
-        return (response.data as any).data.link;
+        console.log('Flutterwave Payment link generated:', (response.data as any).data);
+        return (response.data as any).data;
   } catch (err: any) {
         console.error('Error generating Flutterwave Payment link:', err.response?.data || err.message);
         throw err;
     }
 };
 
-export { flutterwavePaymentLink };
+export { FlutterwavePaymentLink };
