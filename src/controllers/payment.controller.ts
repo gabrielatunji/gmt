@@ -32,42 +32,70 @@ export const userSubscriptions = async (req: Request, res: Response): Promise<Re
 
         const tx_Ref = 'GMT-' + uuidv7();
 
-        const FlutterwaveLink = await FlutterwavePaymentLink({
-            email: user.email,
-            amount, 
-            tx_Ref
-        });
+        // const FlutterwaveLink = await FlutterwavePaymentLink({
+        //     email: user.email,
+        //     amount, 
+        //     tx_Ref
+        // });
 
-        const PaystackLink = await PaystackPaymentLink({
-            email: user.email, 
-            amount, 
-            tx_Ref
-        }); 
+        // const PaystackLink = await PaystackPaymentLink({
+        //     email: user.email, 
+        //     amount, 
+        //     tx_Ref
+        // }); 
 
-        //   //Paystack Circuit Breaker
-        // const paystackOptions = {
-        //       timeout: 3000, // If paystack function doesn't complete within 3 seconds, reject it
-        //       errorThresholdPercentage: 50, // When 50% of requests to paystack fail, trip the circuit
-        //       resetTimeout: 10000 // After 10 seconds, try again.
-        // };
+          //Paystack Circuit Breaker Options
+        const paystackOptions = {
+              timeout: 3000, // If paystack function doesn't complete within 3 seconds, reject it
+              errorThresholdPercentage: 50, // When 50% of requests to paystack fail, trip the circuit
+              resetTimeout: 10000 // After 10 seconds, try again.
+        };
 
-        // const paystackCircuitBreaker = new CircuitBreaker(PaystackPaymentLink, paystackOptions);
+        // Flutterwave Circuit Breaker Options
+        const flutterwaveOptions = {
+                timeout: 3000,
+                errorThresholdPercentage: 50,
+                resetTimeout: 10000
+        };
 
-        // // Flutterwave Circuit Breaker
-        // const flutterwaveOptions = {
-        //         timeout: 3000,
-        //         errorThresholdPercentage: 50,
-        //         resetTimeout: 10000
-        // };
+  // Wrap the payment link functions in the circuit breaker
+        const paystackBreaker = new CircuitBreaker((email: string, amount: number, tx_Ref: string) =>
+                PaystackPaymentLink({ email, amount, tx_Ref }), paystackOptions
+        );
+        const flutterwaveBreaker = new CircuitBreaker((email: string, amount: number, tx_Ref: string) =>
+                FlutterwavePaymentLink({ email, amount, tx_Ref }), flutterwaveOptions
+        );
 
-        // const flutterwaveCircuitBreaker = new CircuitBreaker(FlutterwavePaymentLink, flutterwaveOptions);
+        let transaction;
+        let attempts = 0;
+        const maxAttempts = 2; // Try Paystack, then Flutterwave, then Paystack again, then Flutterwave again (4 total trials before failure)
 
+        // Alternate between Paystack and Flutterwave, up to maxAttempts*2 times
+        while (attempts < maxAttempts * 2) {
+            try {
+                if (attempts % 2 === 0) { // Even attempts: Paystack
+                    transaction = await paystackBreaker.fire(user.email, amount, tx_Ref);
+                    if (transaction.status) break;
+                    throw new Error('Paystack offline');
+                } else { // Odd attempts: Flutterwave
+                    transaction = await flutterwaveBreaker.fire(user.email, amount, tx_Ref);
+                    if (transaction.status) break;
+                    throw new Error('Flutterwave offline');
+                }
+            } catch (err) {
+                console.error(attempts % 2 === 0 ? "Paystack offline, switching to Flutterwave" : "Flutterwave offline, switching to Paystack");
+                attempts++;
+            }
+        }
 
+        if (!transaction || !transaction.status) {
+            return res.status(500).json({ message: "Both payment providers failed. Please try again later." });
+        }
 
         payingUser.subscriptionTxRef = tx_Ref;
         await payingUser.save();
 
-        return res.status(200).json({ message: 'Payment initiated successfully', Flutterwave: FlutterwaveLink, Paystack: PaystackLink });
+        return res.status(200).json({ message: 'Payment initiated successfully', PaymentLink: transaction});
 
       } catch (error: any) {
         console.error("Error initiating payment:", error);
